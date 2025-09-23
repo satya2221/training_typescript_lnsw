@@ -14,11 +14,11 @@
 
 ---
 
-### **Hari 1 & 2: TypeScript Deep Dive for NestJS Developers (Total 6 Jam)**
+### **Hari 1 & 2: TypeScript Deep Dive for NestJS Developers**
 
 Tujuannya bukan hanya mengajarkan sintaks TypeScript, tapi **bagaimana TypeScript memberdayakan NestJS** untuk membangun aplikasi yang kokoh dan mudah dikelola.
 
-#### **Hari 1: From JavaScript to Type-Safe Code (3 Jam)**
+#### **Hari 1: From JavaScript to Type-Safe Code**
 * **Jam 1: Fondasi & Tipe Fundamental**
     * **Recap:** Kenapa TypeScript di NestJS? (Type safety, tooling, skalabilitas).
     * **Tipe Dasar & Kompleks:** `string`, `number`, `boolean`, `array`, `tuple`, `enum`.
@@ -36,7 +36,7 @@ Tujuannya bukan hanya mengajarkan sintaks TypeScript, tapi **bagaimana TypeScrip
     * Penjelasan singkat tentang *metadata reflection API*.
     * Studi Kasus: Membuat *custom decorator* sederhana, misalnya `@User()` untuk mengambil data user dari *request*.
 
-#### **Hari 2: Building Robust & Scalable APIs (3 Jam)**
+#### **Hari 2: Building Robust & Scalable APIs**
 * **Jam 1: Data Transfer Objects (DTO) & Validasi**
     * Pentingnya DTO sebagai "kontrak" API.
     * Implementasi validasi otomatis menggunakan **`class-validator`** dan **`class-transformer`**.
@@ -55,7 +55,7 @@ Tujuannya bukan hanya mengajarkan sintaks TypeScript, tapi **bagaimana TypeScrip
 
 ---
 
-### **Hari 3: Type-Safe Data Persistence with ORM (3 Jam)**
+### **Hari 3: Type-Safe Data Persistence with ORM**
 
 Fokus pada satu ORM modern yang memiliki integrasi TypeScript terbaik. **Prisma** adalah pilihan yang sangat baik di sini, selain **TypeORM** yang juga populer.
 
@@ -78,7 +78,7 @@ Fokus pada satu ORM modern yang memiliki integrasi TypeScript terbaik. **Prisma*
 
 ---
 
-### **Hari 4: Supercharging NestJS with Redis (3 Jam)**
+### **Hari 4: Supercharging NestJS with Redis**
 
 Membahas Redis dari konsep umum hingga implementasi praktis untuk kasus penggunaan paling umum di backend.
 

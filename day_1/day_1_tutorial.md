@@ -1,21 +1,15 @@
-Tentu saja. Saya memahami masukan Anda sepenuhnya. Permintaan untuk format tutorial yang praktis, fokus pada TypeScript murni di awal, dan menyertakan fitur-fitur modern adalah pendekatan yang sangat tepat. Ini akan membangun fondasi yang jauh lebih kokoh sebelum masuk ke kompleksitas framework.
-
-Mari kita rombak total materi Hari ke-1 menjadi sebuah **tutorial langkah-demi-langkah**, di mana kita akan membangun sebuah aplikasi Command-Line Interface (CLI) sederhana dari nol. Proyek ini akan menjadi "pemanasan" yang sempurna.
-
------
-
-### **Materi Pelatihan (Revisi) - Hari 1: Fondasi TypeScript dari Nol**
+### **Hari 1: Fondasi TypeScript dari Nol**
 
 **Selamat Datang di Hari Pertama\!**
 Hari ini kita akan melupakan NestJS sejenak. Tujuan kita adalah menguasai TypeScript sebagai sebuah bahasa. Kita akan membangun aplikasi **CLI Manajemen Inventaris** sederhana dari awal hingga akhir. Di akhir sesi 3 jam ini, Anda akan memiliki proyek TypeScript yang berjalan dan pemahaman mendalam tentang konsep-konsep intinya.
 
 -----
 
-### **Jam 1: Setup Proyek & Fondasi Tipe Data (09:00 - 10:00)**
+### **Jam 1: Setup Proyek & Fondasi Tipe Data**
 
 **Tujuan Jam Ini:** Dari folder kosong menjadi sebuah proyek TypeScript yang terstruktur dengan model data yang kuat.
 
-#### **Langkah 0: Persiapan Lingkungan & Proyek (15 menit)**
+#### **Langkah 0: Persiapan Lingkungan & Proyek**
 
 Kita akan mulai dari nol. Buka terminal Anda.
 
@@ -67,7 +61,7 @@ Kita akan mulai dari nol. Buka terminal Anda.
     touch src/index.ts
     ```
 
-#### **Langkah 1: Skrip Pertama & Tipe Dasar (15 menit)**
+#### **Langkah 1: Skrip Pertama & Tipe Dasar**
 
 Buka `src/index.ts` dan mari kita tulis kode pertama kita.
 
@@ -101,7 +95,7 @@ Untuk menjalankannya:
     ```
     Anda akan melihat output "Selamat datang di Gudang Elektronik\!".
 
-#### **Langkah 2: Mendefinisikan Struktur Data dengan `interface` (15 menit)**
+#### **Langkah 2: Mendefinisikan Struktur Data dengan `interface`**
 
 Setiap item di inventaris kita butuh struktur yang jelas. Di sinilah `interface` bersinar.
 
@@ -133,7 +127,7 @@ printProductInfo(firstProduct);
 
 Sekarang, setiap kali kita bekerja dengan objek `Product`, TypeScript memastikan strukturnya selalu benar.
 
-#### **Langkah 3: Menggunakan `enum` untuk Kategori/Status (15 menit)**
+#### **Langkah 3: Menggunakan `enum` untuk Kategori/Status**
 
 Bagaimana jika produk punya kategori? Menggunakan string biasa (`"elektronik"`, `"aksesoris"`) rawan typo. `enum` adalah solusinya.
 
@@ -171,11 +165,11 @@ const firstProduct: Product = {
 
 -----
 
-### **Jam 2: Class, Modules, dan Fitur Modern (10:15 - 11:15)**
+### **Jam 2: Class, Modules, dan Fitur Modern**
 
 **Tujuan Jam Ini:** Mengorganisir kode kita ke dalam `class` yang logis, memecah file menggunakan *modules*, dan mencoba fitur-fitur TypeScript modern.
 
-#### **Langkah 4: Mengelola Logika dengan `class` (20 menit)**
+#### **Langkah 4: Mengelola Logika dengan `class`**
 
 Mari kita bungkus semua logika inventaris kita ke dalam sebuah `class` agar lebih terorganisir.
 
@@ -247,7 +241,7 @@ manager.listProducts();
 
 Jalankan lagi dengan `npm run build && npm start`. Kode kita sekarang jauh lebih rapi\!
 
-#### **Langkah 5 (Fitur Modern\!): Mengetik dengan Aman menggunakan `satisfies` (15 menit)**
+#### **Langkah 5: Mengetik dengan Aman menggunakan `satisfies`**
 
 Terkadang kita ingin memastikan sebuah objek sesuai dengan sebuah tipe, tapi tanpa kehilangan tipe spesifik dari propertinya. Di sinilah `satisfies` (diperkenalkan di TS 4.9) sangat berguna.
 
@@ -272,7 +266,7 @@ const brandCatalog = {
 console.log(brandCatalog.Samsung.country); // Works!
 ```
 
-#### **Langkah 6 (Fitur Baru\!): Manajemen Resource Otomatis dengan `using` (25 menit)**
+#### **Langkah 6: Manajemen Resource Otomatis dengan `using`**
 
 Fitur dari ES2023 yang didukung penuh di TypeScript 5.2 ke atas. Ini cara modern untuk menangani resource yang perlu ditutup (seperti koneksi database, file, dll) secara otomatis.
 
@@ -323,7 +317,7 @@ Jalankan kembali, dan Anda akan melihat log koneksi dibuka dan ditutup secara ot
 
 -----
 
-### **Jam 3: Asynchronous, Modules & Perkenalan Decorators (11:30 - 12:30)**
+### **Jam 3: Asynchronous, Modules & Perkenalan Decorators**
 
 **Tujuan Jam Ini:** Menangani operasi `async`, merapikan struktur proyek, dan melihat pratinjau `decorators` yang menjadi standar baru.
 
@@ -387,7 +381,7 @@ main();
 
 Sekarang aplikasi kita mensimulasikan alur kerja backend yang lebih realistis.
 
-#### **Langkah 8: Mengorganisir Kode dengan Modules (15 menit)**
+#### **Langkah 8: Mengorganisir Kode dengan Modules**
 
 Proyek kita mulai besar. Saatnya memecah file agar lebih rapi.
 
@@ -412,7 +406,7 @@ ts-inventory-cli/
 
 Ini adalah struktur dasar yang sangat skalabel untuk proyek apa pun.
 
-#### **Langkah 9 (Fitur Standar Baru\!): Pengenalan Decorators (25 menit)**
+#### **Langkah 9: Pengenalan Decorators**
 
 Sebelum kita melihat `decorators` kompleks di NestJS, mari kita pahami dasarnya. Sejak TypeScript 5.0, `decorators` sudah menjadi fitur standar (bukan eksperimental lagi).
 
@@ -499,16 +493,3 @@ export function MeasureTime(target: any, propertyKey: string, descriptor: Proper
     return descriptor;
 }
 ```
-
------
-
-**Rekap & Langkah Selanjutnya**
-
-Hebat\! Dalam 3 jam, kita telah:
-
-1.  Membangun proyek TypeScript dari nol dengan konfigurasi modern.
-2.  Menggunakan `interface` dan `enum` untuk membuat model data yang kuat.
-3.  Mengorganisir kode dengan `class` dan `modules`.
-4.  Menerapkan fitur-fitur baru dan modern seperti `satisfies` dan `using`.
-5.  Memahami cara kerja kode `async`.
-6.  Mendapat gambaran awal tentang `decorators` yang menjadi standar.
