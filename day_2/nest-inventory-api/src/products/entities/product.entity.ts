@@ -12,4 +12,5 @@ export class Product {
     price: number;
     quantity: number;
     category: ProductCategory;
+    salePrice?: number;
 }
