@@ -1,0 +1,380 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model cart_items {
+  cart_item_id    Int            @id @default(autoincrement())
+  cart_id         String         @db.Uuid
+  product_id      Int
+  quantity        Int            @default(1)
+  unit_price      Decimal        @db.Decimal(12, 2)
+  total_price     Decimal?       @default(dbgenerated("((quantity)::numeric * unit_price)")) @db.Decimal(12, 2)
+  product_options Json?
+  added_at        DateTime?      @default(now()) @db.Timestamp(6)
+  updated_at      DateTime?      @default(now()) @db.Timestamp(6)
+  shopping_carts  shopping_carts @relation(fields: [cart_id], references: [cart_id], onDelete: Cascade, onUpdate: NoAction)
+  products        products       @relation(fields: [product_id], references: [product_id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([cart_id], map: "idx_cart_items_cart_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model customer_addresses {
+  address_id            Int           @id @default(autoincrement())
+  user_id               Int
+  address_type          String?       @default("SHIPPING") @db.VarChar(20)
+  address_label         String?       @db.VarChar(50)
+  recipient_name        String        @db.VarChar(100)
+  street_address_line1  String        @db.VarChar(255)
+  street_address_line2  String?       @db.VarChar(255)
+  city                  String        @db.VarChar(100)
+  state_province        String?       @db.VarChar(100)
+  postal_code           String        @db.VarChar(20)
+  country_code          String        @default("US") @db.Char(2)
+  is_default_address    Boolean?      @default(false)
+  delivery_instructions String?
+  created_at            DateTime?     @default(now()) @db.Timestamp(6)
+  updated_at            DateTime?     @default(now()) @db.Timestamp(6)
+  user_accounts         user_accounts @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([user_id], map: "idx_customer_addresses_user_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model customer_orders {
+  order_id               Int                    @id @default(autoincrement())
+  order_number           String                 @unique @db.VarChar(50)
+  user_id                Int?
+  guest_email            String?                @db.VarChar(100)
+  order_status           String?                @default("PENDING") @db.VarChar(30)
+  payment_status         String?                @default("PENDING") @db.VarChar(30)
+  currency_code          String?                @default("USD") @db.Char(3)
+  subtotal_amount        Decimal                @db.Decimal(12, 2)
+  tax_amount             Decimal?               @default(0) @db.Decimal(12, 2)
+  shipping_amount        Decimal?               @default(0) @db.Decimal(12, 2)
+  discount_amount        Decimal?               @default(0) @db.Decimal(12, 2)
+  total_amount           Decimal                @db.Decimal(12, 2)
+  billing_first_name     String?                @db.VarChar(50)
+  billing_last_name      String?                @db.VarChar(50)
+  billing_company        String?                @db.VarChar(100)
+  billing_address_line1  String?                @db.VarChar(255)
+  billing_address_line2  String?                @db.VarChar(255)
+  billing_city           String?                @db.VarChar(100)
+  billing_state          String?                @db.VarChar(100)
+  billing_postal_code    String?                @db.VarChar(20)
+  billing_country_code   String?                @db.Char(2)
+  billing_phone          String?                @db.VarChar(20)
+  shipping_first_name    String?                @db.VarChar(50)
+  shipping_last_name     String?                @db.VarChar(50)
+  shipping_company       String?                @db.VarChar(100)
+  shipping_address_line1 String?                @db.VarChar(255)
+  shipping_address_line2 String?                @db.VarChar(255)
+  shipping_city          String?                @db.VarChar(100)
+  shipping_state         String?                @db.VarChar(100)
+  shipping_postal_code   String?                @db.VarChar(20)
+  shipping_country_code  String?                @db.Char(2)
+  shipping_phone         String?                @db.VarChar(20)
+  shipping_method        String?                @db.VarChar(100)
+  order_notes            String?
+  internal_notes         String?
+  coupon_code            String?                @db.VarChar(50)
+  referral_source        String?                @db.VarChar(100)
+  user_agent             String?
+  ip_address             String?                @db.Inet
+  placed_at              DateTime?              @default(now()) @db.Timestamp(6)
+  confirmed_at           DateTime?              @db.Timestamp(6)
+  shipped_at             DateTime?              @db.Timestamp(6)
+  delivered_at           DateTime?              @db.Timestamp(6)
+  created_at             DateTime?              @default(now()) @db.Timestamp(6)
+  updated_at             DateTime?              @default(now()) @db.Timestamp(6)
+  user_accounts          user_accounts?         @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  order_items            order_items[]
+  payment_transactions   payment_transactions[]
+  product_reviews        product_reviews[]
+
+  @@index([order_number], map: "idx_customer_orders_number")
+  @@index([placed_at], map: "idx_customer_orders_placed_at")
+  @@index([order_status], map: "idx_customer_orders_status")
+  @@index([user_id], map: "idx_customer_orders_user_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model inventory_transactions {
+  transaction_id     Int       @id @default(autoincrement())
+  product_id         Int
+  transaction_type   String    @db.VarChar(20)
+  quantity_change    Int
+  remaining_quantity Int
+  reference_type     String?   @db.VarChar(50)
+  reference_id       Int?
+  notes              String?
+  created_by         Int?      @default(1)
+  created_at         DateTime? @default(now()) @db.Timestamp(6)
+  products           products  @relation(fields: [product_id], references: [product_id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model order_items {
+  order_item_id   Int             @id @default(autoincrement())
+  order_id        Int
+  product_id      Int
+  product_sku     String          @db.VarChar(100)
+  product_name    String          @db.VarChar(255)
+  quantity        Int
+  unit_price      Decimal         @db.Decimal(12, 2)
+  total_price     Decimal?        @default(dbgenerated("((quantity)::numeric * unit_price)")) @db.Decimal(12, 2)
+  product_options Json?
+  created_at      DateTime?       @default(now()) @db.Timestamp(6)
+  customer_orders customer_orders @relation(fields: [order_id], references: [order_id], onDelete: Cascade, onUpdate: NoAction)
+  products        products        @relation(fields: [product_id], references: [product_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([order_id], map: "idx_order_items_order_id")
+  @@index([product_id, created_at], map: "idx_order_items_product_created")
+  @@index([product_id], map: "idx_order_items_product_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model payment_transactions {
+  transaction_id        Int             @id @default(autoincrement())
+  order_id              Int
+  payment_method        String          @db.VarChar(50)
+  payment_provider      String?         @db.VarChar(50)
+  transaction_reference String?         @db.VarChar(255)
+  transaction_type      String?         @db.VarChar(20)
+  transaction_status    String?         @db.VarChar(20)
+  currency_code         String?         @default("USD") @db.Char(3)
+  amount                Decimal         @db.Decimal(12, 2)
+  provider_response     Json?
+  processed_at          DateTime?       @db.Timestamp(6)
+  created_at            DateTime?       @default(now()) @db.Timestamp(6)
+  customer_orders       customer_orders @relation(fields: [order_id], references: [order_id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model product_attribute_values {
+  value_id           Int                @id @default(autoincrement())
+  product_id         Int
+  attribute_id       Int
+  attribute_value    String?
+  created_at         DateTime?          @default(now()) @db.Timestamp(6)
+  product_attributes product_attributes @relation(fields: [attribute_id], references: [attribute_id], onDelete: Cascade, onUpdate: NoAction)
+  products           products           @relation(fields: [product_id], references: [product_id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([product_id, attribute_id])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model product_attributes {
+  attribute_id             Int                        @id @default(autoincrement())
+  attribute_name           String                     @unique @db.VarChar(100)
+  attribute_code           String                     @unique @db.VarChar(50)
+  attribute_type           String?                    @default("TEXT") @db.VarChar(20)
+  is_required              Boolean?                   @default(false)
+  is_filterable            Boolean?                   @default(false)
+  is_searchable            Boolean?                   @default(false)
+  display_order            Int?                       @default(0)
+  created_at               DateTime?                  @default(now()) @db.Timestamp(6)
+  product_attribute_values product_attribute_values[]
+}
+
+model product_brands {
+  brand_id          Int        @id @default(autoincrement())
+  brand_name        String     @unique @db.VarChar(100)
+  brand_slug        String     @unique @db.VarChar(100)
+  brand_description String?
+  brand_logo_url    String?
+  official_website  String?    @db.VarChar(255)
+  country_of_origin String?    @db.VarChar(100)
+  is_featured       Boolean?   @default(false)
+  is_active         Boolean?   @default(true)
+  created_at        DateTime?  @default(now()) @db.Timestamp(6)
+  updated_at        DateTime?  @default(now()) @db.Timestamp(6)
+  products          products[]
+}
+
+model product_categories {
+  category_id              Int                  @id @default(autoincrement())
+  category_name            String               @db.VarChar(100)
+  category_slug            String               @unique @db.VarChar(100)
+  parent_category_id       Int?
+  category_description     String?
+  category_image_url       String?
+  display_order            Int?                 @default(0)
+  is_active                Boolean?             @default(true)
+  seo_meta_title           String?              @db.VarChar(160)
+  seo_meta_description     String?              @db.VarChar(320)
+  created_at               DateTime?            @default(now()) @db.Timestamp(6)
+  updated_at               DateTime?            @default(now()) @db.Timestamp(6)
+  product_categories       product_categories?  @relation("product_categoriesToproduct_categories", fields: [parent_category_id], references: [category_id], onDelete: NoAction, onUpdate: NoAction)
+  other_product_categories product_categories[] @relation("product_categoriesToproduct_categories")
+  products                 products[]
+
+  @@index([parent_category_id], map: "idx_product_categories_parent")
+  @@index([category_slug], map: "idx_product_categories_slug")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model product_images {
+  image_id         Int       @id @default(autoincrement())
+  product_id       Int
+  image_url        String
+  image_alt_text   String?   @db.VarChar(255)
+  image_type       String?   @default("GALLERY") @db.VarChar(20)
+  display_order    Int?      @default(0)
+  is_active        Boolean?  @default(true)
+  file_size_bytes  Int?
+  image_dimensions String?   @db.VarChar(20)
+  created_at       DateTime? @default(now()) @db.Timestamp(6)
+  products         products  @relation(fields: [product_id], references: [product_id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model product_reviews {
+  review_id            Int              @id @default(autoincrement())
+  product_id           Int
+  user_id              Int?
+  order_id             Int?
+  reviewer_name        String           @db.VarChar(100)
+  reviewer_email       String           @db.VarChar(100)
+  rating               Int
+  review_title         String?          @db.VarChar(200)
+  review_content       String?
+  is_verified_purchase Boolean?         @default(false)
+  is_approved          Boolean?         @default(false)
+  helpful_votes        Int?             @default(0)
+  total_votes          Int?             @default(0)
+  created_at           DateTime?        @default(now()) @db.Timestamp(6)
+  updated_at           DateTime?        @default(now()) @db.Timestamp(6)
+  customer_orders      customer_orders? @relation(fields: [order_id], references: [order_id], onDelete: NoAction, onUpdate: NoAction)
+  products             products         @relation(fields: [product_id], references: [product_id], onDelete: Cascade, onUpdate: NoAction)
+  user_accounts        user_accounts?   @relation(fields: [user_id], references: [user_id], onUpdate: NoAction)
+
+  @@index([product_id], map: "idx_product_reviews_product_id")
+  @@index([user_id], map: "idx_product_reviews_user_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model products {
+  product_id               Int                        @id @default(autoincrement())
+  sku                      String                     @unique @db.VarChar(100)
+  product_name             String                     @db.VarChar(255)
+  product_slug             String                     @unique @db.VarChar(255)
+  short_description        String?
+  detailed_description     String?
+  category_id              Int
+  brand_id                 Int?
+  product_type             String?                    @default("SIMPLE") @db.VarChar(50)
+  base_price               Decimal                    @db.Decimal(12, 2)
+  sale_price               Decimal?                   @db.Decimal(12, 2)
+  cost_price               Decimal?                   @db.Decimal(12, 2)
+  weight_kg                Decimal?                   @db.Decimal(8, 3)
+  dimensions_cm            String?                    @db.VarChar(50)
+  tax_class                String?                    @default("STANDARD") @db.VarChar(50)
+  is_featured              Boolean?                   @default(false)
+  is_digital               Boolean?                   @default(false)
+  requires_shipping        Boolean?                   @default(true)
+  track_inventory          Boolean?                   @default(true)
+  manage_stock             Boolean?                   @default(true)
+  stock_quantity           Int?                       @default(0)
+  low_stock_threshold      Int?                       @default(5)
+  stock_status             String?                    @default("IN_STOCK") @db.VarChar(20)
+  visibility               String?                    @default("CATALOG") @db.VarChar(20)
+  product_status           String?                    @default("ACTIVE") @db.VarChar(20)
+  seo_meta_title           String?                    @db.VarChar(160)
+  seo_meta_description     String?                    @db.VarChar(320)
+  created_by               Int?                       @default(1)
+  updated_by               Int?
+  created_at               DateTime?                  @default(now()) @db.Timestamp(6)
+  updated_at               DateTime?                  @default(now()) @db.Timestamp(6)
+  cart_items               cart_items[]
+  inventory_transactions   inventory_transactions[]
+  order_items              order_items[]
+  product_attribute_values product_attribute_values[]
+  product_images           product_images[]
+  product_reviews          product_reviews[]
+  product_brands           product_brands?            @relation(fields: [brand_id], references: [brand_id], onDelete: NoAction, onUpdate: NoAction)
+  product_categories       product_categories         @relation(fields: [category_id], references: [category_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([brand_id], map: "idx_products_brand_id")
+  @@index([brand_id, product_status], map: "idx_products_brand_status")
+  @@index([category_id], map: "idx_products_category_id")
+  @@index([category_id, product_status], map: "idx_products_category_status")
+  @@index([created_at], map: "idx_products_created_at")
+  @@index([base_price], map: "idx_products_price")
+  @@index([sku], map: "idx_products_sku")
+  @@index([product_slug], map: "idx_products_slug")
+  @@index([product_status], map: "idx_products_status")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model shopping_carts {
+  cart_id       String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id       Int?
+  session_id    String?        @db.VarChar(255)
+  cart_status   String?        @default("ACTIVE") @db.VarChar(20)
+  currency_code String?        @default("USD") @db.Char(3)
+  created_at    DateTime?      @default(now()) @db.Timestamp(6)
+  updated_at    DateTime?      @default(now()) @db.Timestamp(6)
+  expires_at    DateTime?      @default(dbgenerated("(CURRENT_TIMESTAMP + '30 days'::interval)")) @db.Timestamp(6)
+  cart_items    cart_items[]
+  user_accounts user_accounts? @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([session_id], map: "idx_shopping_carts_session_id")
+  @@index([user_id], map: "idx_shopping_carts_user_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model user_accounts {
+  user_id            Int                  @id @default(autoincrement())
+  username           String               @unique @db.VarChar(50)
+  email_address      String               @unique @db.VarChar(100)
+  password_hash      String               @db.VarChar(255)
+  first_name         String?              @db.VarChar(50)
+  last_name          String?              @db.VarChar(50)
+  phone_number       String?              @db.VarChar(20)
+  date_of_birth      DateTime?            @db.Date
+  registration_date  DateTime?            @default(now()) @db.Timestamp(6)
+  last_login_time    DateTime?            @db.Timestamp(6)
+  account_status     String?              @default("ACTIVE") @db.VarChar(20)
+  email_verified     Boolean?             @default(false)
+  created_by         Int?                 @default(1)
+  updated_by         Int?
+  created_at         DateTime?            @default(now()) @db.Timestamp(6)
+  updated_at         DateTime?            @default(now()) @db.Timestamp(6)
+  customer_addresses customer_addresses[]
+  customer_orders    customer_orders[]
+  product_reviews    product_reviews[]
+  shopping_carts     shopping_carts[]
+  user_profiles      user_profiles[]
+
+  @@index([email_address], map: "idx_user_accounts_email")
+  @@index([account_status], map: "idx_user_accounts_status")
+  @@index([username], map: "idx_user_accounts_username")
+}
+
+model user_profiles {
+  profile_id          Int           @id @default(autoincrement())
+  user_id             Int
+  profile_picture_url String?
+  bio                 String?
+  website_url         String?       @db.VarChar(255)
+  social_media_links  Json?
+  preferences         Json?         @default("{}")
+  loyalty_points      Int?          @default(0)
+  referral_code       String?       @unique @db.VarChar(20)
+  timezone            String?       @default("UTC") @db.VarChar(50)
+  language_preference String?       @default("en") @db.VarChar(10)
+  marketing_consent   Boolean?      @default(false)
+  created_at          DateTime?     @default(now()) @db.Timestamp(6)
+  updated_at          DateTime?     @default(now()) @db.Timestamp(6)
+  user_accounts       user_accounts @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([user_id], map: "idx_user_profiles_user_id")
+}
