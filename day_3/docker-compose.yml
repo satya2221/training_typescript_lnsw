@@ -1,0 +1,131 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  postgres-db:
+    image: postgres:17
+    container_name: day3-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: inventory
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+
+  # MongoDB Node 1 (Initial Primary)
+  mongo1:
+    image: mongo:8.0
+    container_name: mongo1
+    hostname: mongo1
+    command: ["--replSet", "rs0", "--bind_ip_all"]
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo1_data:/data/db
+    networks:
+      - mongonet
+    healthcheck:
+      test: |
+        mongosh --host mongo1:27017 --eval 'db.runCommand("ping").ok' --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # MongoDB Node 2 (Secondary)
+  mongo2:
+    image: mongo:8.0
+    container_name: mongo2
+    hostname: mongo2
+    command: ["--replSet", "rs0", "--bind_ip_all"]
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo2_data:/data/db
+    networks:
+      - mongonet
+    healthcheck:
+      test: |
+        mongosh --host mongo2:27017 --eval 'db.runCommand("ping").ok' --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # MongoDB Node 3 (Secondary)
+  mongo3:
+    image: mongo:8.0
+    container_name: mongo3
+    hostname: mongo3
+    command: ["--replSet", "rs0", "--bind_ip_all"]
+    ports:
+      - "27019:27017"
+    volumes:
+      - mongo3_data:/data/db
+    networks:
+      - mongonet
+    healthcheck:
+      test: |
+        mongosh --host mongo3:27017 --eval 'db.runCommand("ping").ok' --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # Replica Set Initializer
+  mongo-init:
+    image: mongo:8.0
+    container_name: mongo-init
+    depends_on:
+      mongo1:
+        condition: service_healthy
+      mongo2:
+        condition: service_healthy
+      mongo3:
+        condition: service_healthy
+    command: >
+      mongosh --host mongo1:27017 --eval
+      '
+      try {
+        rs.status();
+        console.log("Replica set already initialized.");
+      } catch (e) {
+        console.log("Initializing replica set...");
+        rs.initiate({
+          _id: "rs0",
+          members: [
+            { _id: 0, host: "mongo1:27017" },
+            { _id: 1, host: "mongo2:27017" },
+            { _id: 2, host: "mongo3:27017" }
+          ]
+        });
+      }
+      '
+    networks:
+      - mongonet
+
+  redis-cache:
+    image: redis:8
+    container_name: day3-redis
+    restart: always
+    command: redis-server --requirepass redispassword123
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis_data:/data
+
+# Define the network for containers to communicate
+networks:
+  mongonet:
+    driver: bridge
+
+# Define persistent volumes for data
+volumes:
+  postgres_data:
+  mongo1_data:
+  mongo2_data:
+  mongo3_data:
+  redis_data:
