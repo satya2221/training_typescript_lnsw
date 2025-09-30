@@ -22,12 +22,12 @@ import { BullModule } from '@nestjs/bullmq';
                 host: 'localhost',
                 port: 6379,
                 db: 0,
-                password: 'redispassword123',
+                //password: 'redispassword123',
             },
         }),
         CacheModule.registerAsync({
             useFactory: async () => ({
-                stores: [createKeyv('redis://:redispassword123@localhost:6379/0')],
+                stores: [createKeyv('redis://@localhost:6379/0')],
                 ttl: 60 * 1000, // Time-to-live default dalam milidetik (60 detik)
             }),
             isGlobal: true, // Membuat cache manager tersedia di seluruh aplikasi
@@ -36,10 +36,10 @@ import { BullModule } from '@nestjs/bullmq';
             type: 'postgres',
             host: process.env.DB_HOST || 'localhost',
             port: parseInt(process.env.DB_PORT || '5432'),
-            username: process.env.DB_USERNAME || 'user',
-            password: process.env.DB_PASSWORD || 'password',
-            database: process.env.DB_DATABASE || 'inventory',
-            schema: process.env.DB_SCHEMA || 'typeorm_demo', // Use separate schema to avoid conflicts
+            username: process.env.DB_USERNAME || 'myuser',
+            password: process.env.DB_PASSWORD || '#Srondol[Y7]',
+            database: process.env.DB_DATABASE || 'mydb',
+            schema: process.env.DB_SCHEMA || 'public', // Use separate schema to avoid conflicts
             entities: [User, Category, Product, Order, OrderItem],
             synchronize: false, // Only for demo - use migrations in production
             logging: ['query'], // Enable query logging for demo
