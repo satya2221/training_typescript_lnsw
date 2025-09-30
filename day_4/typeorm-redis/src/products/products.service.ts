@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 
@@ -15,6 +15,7 @@ export class ProductsService {
   constructor(
     @InjectRepository(Products)
     private readonly productRepository: Repository<Products>,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ){}
 
   create(createProductDto: CreateProductDto) {
@@ -28,8 +29,27 @@ export class ProductsService {
     });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
+  async findOne(id: number): Promise<Products> {
+    const cacheKey = `product_${id}`;
+
+    const cachedProduct = await this.cacheManager.get<Products>(cacheKey);
+    if(cachedProduct){
+      console.log(`--- Ambil dari cache untuk id :${id} ---`)
+      return cachedProduct;
+    }
+
+    console.log("--- Ambil dari Database ---");
+    const product = await this.productRepository.findOne({
+      where: {id},
+      relations:['category', 'orderItems', 'orderItems.order']
+    })
+    if(!product){
+      throw new NotFoundException(`Product id: ${id} is not found`)
+    }
+
+    await this.cacheManager.set(cacheKey, product);
+
+    return product;
   }
 
   update(id: number, updateProductDto: UpdateProductDto) {
